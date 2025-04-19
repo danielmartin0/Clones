@@ -1,6 +1,10 @@
 local Public = {}
 
 script.on_event(defines.events.on_player_crafted_item, function(event)
+	if not (event.item_stack and event.item_stack.valid and event.item_stack.valid_for_read) then
+		return
+	end
+
 	local name = event.item_stack.name
 	if name ~= "clones-clone" then
 		return
