@@ -1,7 +1,8 @@
 ---------------------------------------------------------------------------------------------------
-Version: 1.1.5
+Version: 1.2.0
 Date: ????
-  Changes:
+  Bugfixes:
+    - Fixed that Clones on space platforms would end up outside the hub when switching into them. (This fix should be backwards-compatible.)
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.4
 Date: 2025-04-19

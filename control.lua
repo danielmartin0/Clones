@@ -1,5 +1,7 @@
 local Public = {}
 
+local WARN_COLOR = { r = 255, g = 90, b = 54 }
+
 script.on_event(defines.events.on_player_crafted_item, function(event)
 	if not (event.item_stack and event.item_stack.valid and event.item_stack.valid_for_read) then
 		return
@@ -82,7 +84,11 @@ script.on_event("clones-switch-character", function(event)
 	end
 
 	local next_character = Public.get_next_character(player.index, player.character)
-	Public.switch_to_character(player, next_character)
+	if next_character ~= player.character then
+		Public.switch_to_character(player, next_character)
+	else
+		player.print("[Whisper] No next character found.", { color = WARN_COLOR })
+	end
 end)
 
 script.on_event("clones-switch-character-reverse", function(event)
@@ -93,7 +99,11 @@ script.on_event("clones-switch-character-reverse", function(event)
 	end
 
 	local previous_character = Public.get_next_character(player.index, player.character, true)
-	Public.switch_to_character(player, previous_character)
+	if previous_character ~= player.character then
+		Public.switch_to_character(player, previous_character)
+	else
+		player.print("[Whisper] No previous character found.", { color = WARN_COLOR })
+	end
 end)
 
 script.on_event(defines.events.on_pre_player_died, function(event)
@@ -184,14 +194,28 @@ function Public.switch_to_character(player, target_character)
 	player.set_controller({
 		type = defines.controllers.remote,
 	})
+
 	player.set_controller({
 		type = defines.controllers.god,
 	})
-	player.teleport(target_character.position, target_character.surface)
+
+	local target_surface = target_character.surface
+
+	player.teleport(target_character.position, target_surface)
+
 	player.set_controller({
 		type = defines.controllers.character,
 		character = target_character,
 	})
+
+	if
+		target_surface.platform
+		and target_surface.platform.valid
+		and target_surface.platform.hub
+		and target_surface.platform.hub.valid
+	then
+		player.enter_space_platform(target_surface.platform)
+	end
 end
 
 return Public
