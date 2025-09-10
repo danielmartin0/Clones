@@ -1,7 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 1.2.1
 Date: ????
-  Changes:
+  Bugfixes:
+    - Fixed that characters created by rejoining multiplayer games would be lost after switching out of them.
 ---------------------------------------------------------------------------------------------------
 Version: 1.2.0
 Date: 2025-08-31

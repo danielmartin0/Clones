@@ -131,21 +131,25 @@ script.on_event(defines.events.on_player_controller_changed, function(event)
 		return
 	end
 
+	Public.register_character_if_missing(player.index, entity)
+end)
+
+function Public.register_character_if_missing(player_index, character)
 	storage.characters = storage.characters or {}
-	storage.characters[player.index] = storage.characters[player.index] or {}
+	storage.characters[player_index] = storage.characters[player_index] or {}
 
 	local found = false
-	for _, char in ipairs(storage.characters[player.index]) do
-		if char == entity then
+	for _, char in ipairs(storage.characters[player_index]) do
+		if char == character then
 			found = true
 			break
 		end
 	end
 
 	if not found then
-		table.insert(storage.characters[player.index], entity)
+		table.insert(storage.characters[player_index], character)
 	end
-end)
+end
 
 function Public.get_next_character(player_index, current_character, backwards)
 	storage.characters = storage.characters or {}
@@ -189,6 +193,10 @@ end
 function Public.switch_to_character(player, target_character)
 	if not (player and target_character and target_character.valid) then
 		return
+	end
+
+	if player.character then
+		Public.register_character_if_missing(player.index, player.character)
 	end
 
 	player.set_controller({
