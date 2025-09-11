@@ -3,7 +3,7 @@
     "author": "thesixthroc",
     "version": "1.3.1",
     "title": "Clones",
-    "description": "A new technology allows handcrafting character clones out of nutrients and bioflux.\n\nThe configurable keybinding CTRL+TAB switches players between each of their characters.",
+    "description": "A new technology allows handcrafting character clones out of nutrients and bioflux. Alternatively, the player can start the game with several clones.\n\nThe configurable keybinding CTRL+TAB switches players between each of their characters.",
     "contact": "Discord: thesixthroc",
     "factorio_version": "2.0",
     "spoiling_required": true,
