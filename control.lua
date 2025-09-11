@@ -42,10 +42,25 @@ script.on_event(defines.events.on_player_crafted_item, function(event)
 		end
 	end
 
+	local clone = Public.create_clone(player)
+
+	if clone then
+		Public.switch_to_character(player, clone)
+	end
+end)
+
+function Public.get_current_clone(player)
+	local player_index = player.index
+
 	storage.characters = storage.characters or {}
-	storage.characters[player.index] = storage.characters[player.index] or {}
+	storage.characters[player_index] = storage.characters[player_index] or {}
 
 	local current_character = player.character
+
+	if not (current_character and current_character.valid) then
+		return
+	end
+
 	local current_character_found = false
 	local current_index = 1
 	for i, char in ipairs(storage.characters[player.index]) do
@@ -61,20 +76,35 @@ script.on_event(defines.events.on_player_crafted_item, function(event)
 		current_index = #storage.characters[player.index]
 	end
 
-	local pos = player.surface.find_non_colliding_position("character", player.position, 100, 1)
-	if pos then
-		local clone = player.surface.create_entity({
-			name = player.character.name,
-			position = pos,
-			force = player.force,
-		})
+	return current_character, current_index
+end
 
-		table.insert(storage.characters[player.index], current_index + 1, clone)
+function Public.create_clone(player, position)
+	storage.characters = storage.characters or {}
+	storage.characters[player.index] = storage.characters[player.index] or {}
 
-		local next_character = Public.get_next_character(player.index, current_character)
-		Public.switch_to_character(player, next_character)
+	if not position then
+		position = player.surface.find_non_colliding_position("character", player.position, 100, 1)
 	end
-end)
+
+	if not position then
+		return
+	end
+
+	local current_character, current_index = Public.get_current_clone(player)
+
+	if not (current_character and current_character.valid) then
+		current_index = #storage.characters[player.index]
+	end
+
+	local clone = player.surface.create_entity({
+		name = current_character and current_character.name or "character",
+		position = position,
+		force = player.force,
+	})
+
+	table.insert(storage.characters[player.index], current_index + 1, clone)
+end
 
 script.on_event("clones-switch-character", function(event)
 	local player = game.players[event.player_index]
@@ -132,6 +162,36 @@ script.on_event(defines.events.on_player_controller_changed, function(event)
 	end
 
 	Public.register_character_if_missing(player.index, entity)
+end)
+
+script.on_event(defines.events.on_player_created, function(event)
+	local player = game.players[event.player_index]
+	if not (player and player.valid) then
+		return
+	end
+
+	local p = player.character and player.character.valid and player.character.position
+
+	if not p then
+		p = player.cutscene_character and player.cutscene_character.valid and player.cutscene_character.position
+	end
+
+	if not p then
+		p = player.position
+	end
+
+	if settings.global["clones-start-of-game-count"].value > 0 then
+		for i = 1, settings.global["clones-start-of-game-count"].value do
+			local p2 = {
+				x = p.x + math.random(-5, 5),
+				y = p.y + math.random(-5, 5),
+			}
+
+			local p3 = player.surface.find_non_colliding_position("character", p2, 100, 1)
+
+			Public.create_clone(player, p3)
+		end
+	end
 end)
 
 function Public.register_character_if_missing(player_index, character)
