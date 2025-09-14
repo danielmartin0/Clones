@@ -26,18 +26,7 @@ script.on_event(defines.events.on_player_crafted_item, function(event)
 		for i = #crafting_queue, 1, -1 do
 			local craft = crafting_queue[i]
 			if craft.recipe == "clones-clone" then
-				local recipe = prototypes.recipe["clones-clone"]
-				local ingredients = recipe.ingredients
-
 				player.cancel_crafting({ index = i, count = craft.count })
-
-				for _, ingredient in pairs(ingredients) do
-					player.insert({
-						name = ingredient.name,
-						count = ingredient.amount * craft.count,
-						quality = quality,
-					})
-				end
 			end
 		end
 	end
@@ -104,6 +93,8 @@ function Public.create_clone(player, position)
 	})
 
 	table.insert(storage.characters[player.index], current_index + 1, clone)
+
+	return clone
 end
 
 script.on_event("clones-switch-character", function(event)
